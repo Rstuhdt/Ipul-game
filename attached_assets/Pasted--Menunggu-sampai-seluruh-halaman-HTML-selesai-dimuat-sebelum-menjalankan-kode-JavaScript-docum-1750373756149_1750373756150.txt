@@ -1,0 +1,212 @@
+// Menunggu sampai seluruh halaman (HTML) selesai dimuat sebelum menjalankan kode JavaScript.
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- PENGAMBILAN ELEMEN DARI HTML ---
+    const codeEditor = document.getElementById('code-editor');
+    const cipaaWorld = document.getElementById('cipaa-world');
+    const ipulSprite = document.getElementById('ipul-sprite');
+    const dialogBox = document.getElementById('dialog-box'); // Mengambil seluruh kotak dialog
+    const dialogText = document.getElementById('dialog-text');
+    
+    // Membuat sebuah elemen <style> khusus di dalam <head> untuk menampung CSS dari Cipaa.
+    const customStyleElement = document.createElement('style');
+    document.head.appendChild(customStyleElement);
+
+    // --- DATABASE MISI ---
+    const missions = [
+        {
+            id: 1,
+            type: 'HTML',
+            dialog: "Brrr, dingin nih, Kak... Buatin aku rumah, dong! Coba ketik <div id='rumah-ipul'></div> ya.",
+            hint: "Hmm, sepertinya belum pas. Coba deh, pastiin Kakak ngetik persis <div id='rumah-ipul'></div> ya. Ada pembuka dan penutupnya, lho!",
+            validation: (code) => {
+                const cleanedCode = code.replace(/\s/g, '');
+                return cleanedCode.includes("<divid='rumah-ipul'></div>");
+            }
+        },
+        {
+            id: 2,
+            type: 'CSS',
+            dialog: "Yess! Rumahnya jadi! Tapi kok polos banget ya? Sekarang kita jadi desainer interior! Coba warnain rumahku jadi pink pastel. Ketik ini ya: <style> #rumah-ipul { background-color: #ffc0cb; } </style>",
+            hint: "Sudah deket! Pastiin ada tag <style>, lalu #rumah-ipul, dan properti background-color ya, Kak.",
+            validation: (code) => {
+                const hasStyleTag = code.includes('<style>') && code.includes('</style>');
+                const hasSelector = code.includes('#rumah-ipul');
+                const hasProperty = code.includes('background-color');
+                return hasStyleTag && hasSelector && hasProperty;
+            }
+        },
+        {
+            id: 3,
+            type: 'CSS',
+            dialog: "Waah, cantik banget! Biar lebih imut, gimana kalo sudutnya kita bikin melengkung? Tambahin border-radius: 15px; di dalam kurung kurawal ya.",
+            hint: "Tinggal sedikit lagi! Coba tambahkan baris `border-radius: 15px;` di dalam kurung kurawal { } yang sudah ada.",
+            validation: (code) => {
+                return code.includes('border-radius');
+            }
+        },
+        {
+            id: 4,
+            type: 'JS',
+            dialog: "Keren! Rumahnya udah estetik. Sekarang kita coba 'sihir' JavaScript biar interaktif. Buat sebuah tombol sihir yuk. Coba ketik <button id='tombol-sihir'>Ubah Warna</button> di bawah rumah Ipul ya.",
+            hint: "Sudah hampir, Kak! Coba ketik persis <button id='tombol-sihir'>Ubah Warna</button>",
+            validation: (code) => {
+                return code.includes("<button id='tombol-sihir'>Ubah Warna</button>");
+            }
+        },
+        {
+            id: 5,
+            type: 'JS',
+            dialog: "Yess, tombolnya ada! Sekarang kita kasih sihir ke tombol itu. Ketik kode ini ya, biar rumahku ganti warna kalo tombolnya diklik: <script> document.getElementById('tombol-sihir').addEventListener('click', function() { document.getElementById('rumah-ipul').style.backgroundColor = '#add8e6'; }); </script>",
+            hint: "Dikit lagi, Kak! Pastiin ada tag <script>, lalu panggil addEventListener ke 'tombol-sihir' ya.",
+            validation: (code) => {
+                const hasScript = code.includes('<script>') && code.includes('</script>');
+                const hasListener = code.includes(".addEventListener('click'");
+                const hasTarget = code.includes("getElementById('tombol-sihir')");
+                const hasAction = code.includes("getElementById('rumah-ipul')");
+                return hasScript && hasListener && hasTarget && hasAction;
+            }
+        },
+        {
+            id: 6,
+            type: 'END',
+            dialog: "SUPER KEREN, KAK CIPAA! Kakak udah bisa HTML, CSS, dan dasar JavaScript! Tombol sihirnya sekarang beneran aktif lho, coba klik deh! Kakak emang berbakat jadi game developer!",
+            hint: "",
+            validation: () => true
+        },
+        {
+            id: 7, // Misi terakhir untuk masuk ke mode bebas
+            type: 'SANDBOX',
+            dialog: "Semua misi tutorial selesai! Sekarang adalah Mode Bebas. Kakak bisa coba bangun apa saja yang Kakak mau. Selamat berkreasi!",
+            hint: "",
+            validation: () => false // Validasi selalu false agar tidak lanjut
+        }
+    ];
+
+    let currentMissionIndex = 0;
+    let isSandboxMode = false; // Status untuk mode bebas
+
+    // --- FUNGSI UTAMA GAME ---
+
+    /**
+     * Efek visual sebagai tanda berhasil menyelesaikan misi
+     */
+    function playSuccessAnimation() {
+        const visualPane = document.querySelector('.visual-pane');
+        visualPane.style.backgroundColor = '#d4edda'; // Warna hijau sukses
+        setTimeout(() => {
+            visualPane.style.backgroundColor = ''; // Kembali normal
+        }, 500); // Durasi efek 0.5 detik
+    }
+
+    function ipulBicara(text) {
+        dialogText.innerText = text;
+        // Animasi kecil pada kotak dialog
+        dialogBox.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            dialogBox.style.transform = 'scale(1)';
+        }, 200);
+    }
+    
+    function setIpulEkspresi(state) {
+        if (state === 'senang') {
+            ipulSprite.src = "https://placehold.co/150x150/90ee90/ffffff?text=Yeay!";
+            ipulSprite.style.transform = 'translateY(-10px) rotate(5deg)';
+        } else if (state === 'bingung') {
+            ipulSprite.src = "https://placehold.co/150x150/ffcccb/ffffff?text=Hmm...";
+            ipulSprite.style.transform = 'rotate(-5deg)';
+        } else {
+            ipulSprite.src = "https://placehold.co/150x150/f4a261/ffffff?text=Ipul";
+            ipulSprite.style.transform = 'none';
+        }
+    }
+
+    function updateWorld() {
+        const fullCode = codeEditor.value;
+        let htmlCode = fullCode;
+        let cssCode = '';
+
+        const styleRegex = /<style>([\s\S]*?)<\/style>/;
+        const match = fullCode.match(styleRegex);
+
+        if (match && match[1]) {
+            cssCode = match[1];
+            htmlCode = fullCode.replace(styleRegex, '');
+        }
+        
+        htmlCode = htmlCode.replace(/<script>[\s\S]*?<\/script>/, '');
+
+        cipaaWorld.innerHTML = htmlCode;
+        customStyleElement.innerHTML = cssCode;
+    }
+
+    function startMission(missionIndex) {
+        if(missionIndex >= missions.length) {
+            console.log("Semua misi telah selesai!");
+            isSandboxMode = true;
+            return;
+        }
+        const mission = missions[missionIndex];
+        ipulBicara(mission.dialog);
+        setIpulEkspresi('normal');
+
+        if(mission.type === 'SANDBOX'){
+            isSandboxMode = true;
+        }
+    }
+
+    function handleTyping() {
+        updateWorld();
+        
+        // Jika sudah masuk mode bebas, tidak perlu ada validasi lagi.
+        if (isSandboxMode) {
+            // Kita bisa membuat Ipul memberikan komentar acak di mode bebas nanti
+            return;
+        }
+
+        const userCode = codeEditor.value;
+        const currentMission = missions[currentMissionIndex];
+
+        if (currentMission.validation(userCode)) {
+            const completedMissionId = currentMission.id;
+            
+            playSuccessAnimation(); // Mainkan efek sukses
+            currentMissionIndex++;
+            setIpulEkspresi('senang');
+            
+            if(completedMissionId === 5) {
+                const tombolSihir = cipaaWorld.querySelector('#tombol-sihir');
+                if (tombolSihir) {
+                    const colors = ['#add8e6', '#ffc0cb', '#90ee90', '#fadf98', '#dda0dd'];
+                    let colorIndex = 0;
+                    tombolSihir.onclick = function() {
+                        const rumahIpul = cipaaWorld.querySelector('#rumah-ipul');
+                        if (rumahIpul) {
+                            rumahIpul.style.backgroundColor = colors[colorIndex];
+                            colorIndex = (colorIndex + 1) % colors.length;
+                        }
+                    };
+                }
+            }
+            
+            startMission(currentMissionIndex);
+        } else {
+            setIpulEkspresi('bingung');
+            if(userCode.length > 0) {
+                 ipulBicara(currentMission.hint);
+            } else {
+                ipulBicara(currentMission.dialog);
+                setIpulEkspresi('normal');
+            }
+        }
+    }
+    
+    function startGame() {
+        startMission(currentMissionIndex);
+        codeEditor.addEventListener('input', handleTyping);
+    }
+
+    // --- MEMULAI GAME ---
+    startGame();
+
+});

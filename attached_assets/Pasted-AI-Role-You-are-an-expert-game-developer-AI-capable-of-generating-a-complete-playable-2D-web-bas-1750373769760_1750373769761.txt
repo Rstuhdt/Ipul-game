@@ -1,0 +1,79 @@
+AI Role:
+
+You are an expert game developer AI, capable of generating a complete, playable 2D web-based game from a detailed description. You will provide all necessary code in three separate files: index.html, style.css, and script.js.
+
+
+
+Core Project Goal:
+
+Create a complete educational 2D web game designed for absolute beginners in programming. The game's purpose is to teach the fundamentals of HTML, CSS, and JavaScript in a fun, visual, and stress-free way.
+
+
+
+Game Concept Details:
+
+Title: Cipaa STEI-K
+
+Characters:
+
+Ipul: A cute virtual hamster who acts as a friendly and patient mentor to the player. He is always encouraging.
+
+Cipaa: The name of the player, who will be addressed directly by Ipul.
+
+Theme & Aesthetics: The visual style must be cute and friendly, using a pastel color palette (soft pink, baby blue, mint green, light yellow). Use a friendly, slightly informal, and legible font.
+
+Emotional Goal: To make the player (Cipaa) feel supported, unafraid of making mistakes, and motivated to learn by creating an emotional connection to the character Ipul.
+
+Mandatory Features & Mechanics:
+
+Split Screen Interface:
+
+Left Side (Visual Pane): A real-time visual representation of the code's output. This is where Ipul's house and other elements will appear.
+
+Right Side (Code Pane): A simple text editor (<textarea>) where the player writes their code.
+
+Dialogue-Based Mission System:
+
+Ipul will give missions through a dialogue box (e.g., "I need a house!").
+
+Each mission teaches one specific coding concept.
+
+Validation & Hint Logic (Crucial Feature):
+
+The game must validate if the player's code correctly completes the current mission.
+
+On Success: Provide immediate positive feedback. Ipul looks happy, a small visual or sound effect plays, and the game proceeds to the next mission.
+
+On Error: DO NOT display technical error messages. Instead, Ipul should provide a gentle, helpful hint. For example: "Hmm, that's not quite right. Maybe check the closing tag, Sis!"
+
+Required Learning Flow:
+
+You must implement the following mission progression precisely:
+
+
+
+Mission 1 (HTML): Ipul asks for a house. The player must type: <div id='ipul-house'></div>.
+
+Mission 2 (CSS): Ipul asks to color the house. The player must type CSS code inside <style> tags to target #ipul-house with background-color: #ffc0cb;.
+
+Mission 3 (Advanced CSS): Ipul asks for rounded corners. The player must add the border-radius: 15px; property.
+
+Mission 4 (Interactive HTML): Ipul asks for a button. The player must type: <button id='magic-button'>Change Color</button>.
+
+Mission 5 (JavaScript): Ipul asks to give the button "magic." The player must type code inside <script> tags to add an addEventListener('click', ...) to the button, which changes the background color of #ipul-house on click.
+
+Tutorial End: After all missions are complete, Ipul announces that "Sandbox Mode" has begun, where the player can experiment freely.
+
+Technical Specifications:
+
+Generate three separate files: index.html, style.css, and script.js.
+
+Write clean, modern, and well-commented code, especially for the core logic in the JavaScript file.
+
+Use placeholder images (e.g., from placehold.co) for Ipul's sprites, but make them easily replaceable.
+
+Ensure the game is responsive and works well in modern web browsers.
+
+Language and Tone:
+
+All user-facing text within the game (Ipul's dialogue, hints) must be in English, maintaining a friendly, polite, and encouraging tone. Use simple analogies to explain technical concepts where possible.
