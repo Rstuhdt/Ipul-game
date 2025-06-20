@@ -1,9 +1,3 @@
-AI Role:
-
-You are an expert game developer AI, capable of generating a complete, playable 2D web-based game from a detailed description. You will provide all necessary code in three separate files: index.html, style.css, and script.js.
-
-
-
 Core Project Goal:
 
 Create a complete educational 2D web game designed for absolute beginners in programming. The game's purpose is to teach the fundamentals of HTML, CSS, and JavaScript in a fun, visual, and stress-free way.
